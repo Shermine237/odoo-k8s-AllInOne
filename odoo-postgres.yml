@@ -62,14 +62,21 @@ spec:
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
+        - name: PGDATA
+          value: /var/lib/postgresql/data
       volumeMounts:
         - name: postgres-config-volume
           mountPath: /etc/postgresql/postgresql.conf
           subPath: postgresql.conf
+        - name: postgres-data-volume
+          mountPath: /var/lib/postgresql/data
   volumes:
     - name: postgres-config-volume
       configMap:
         name: postgres-config-prepod
+    - name: postgres-data-volume
+      hostPath:
+        path: /home/master/volume/pre-production/postgres
 ---
 apiVersion: v1
 kind: Pod
@@ -96,7 +103,12 @@ spec:
         - name: config-volume
           mountPath: /etc/odoo/odoo.conf
           subPath: odoo.conf
+        - name: addons-volume
+          mountPath: /mnt/extra-addons
   volumes:
     - name: config-volume
       configMap:
         name: odoo-config-prepod
+    - name: addons-volume
+      hostPath:
+        path: /home/master/volume/pre-production/odoo/addons
