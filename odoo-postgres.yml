@@ -20,6 +20,7 @@ data:
     db_user = odoo
     db_password = odoo
     addons_path = /mnt/extra-addons
+    debug_mode = True
 ---
 apiVersion: v1
 kind: Service
@@ -89,6 +90,7 @@ spec:
   containers:
     - name: odoo-prepod
       image: odoo:16
+      command: ["odoo", "-i", "base"]
       ports:
         - containerPort: 8069
       env:
