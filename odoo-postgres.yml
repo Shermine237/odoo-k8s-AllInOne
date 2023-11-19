@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: odoo-config-prepod
+  name: odoo-config-preprod
 data:
   odoo.conf: |
     [options]
     admin_user = admin@example.com
     admin_passwd = admin
-    db_host = odoo-postgres-service-prepod
+    db_host = odoo-postgres-service-preprod
     db_port = 5432
     db_user = odoo
     db_password = odoo
@@ -22,7 +22,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-config-prepod
+  name: postgres-config-preprod
 data:
   postgresql.conf: |
     listen_addresses = '*'
@@ -35,10 +35,10 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: odoo-postgres-service-prepod
+  name: odoo-postgres-service-preprod
 spec:
   selector:
-    app: odoo-postgres-prepod
+    app: odoo-postgres-preprod
   ports:
     - protocol: TCP
       port: 5432
@@ -48,10 +48,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: odoo-service-prepod
+  name: odoo-service-preprod
 spec:
   selector:
-    app: odoo-prepod
+    app: odoo-preprod
   ports:
     - protocol: TCP
       port: 8069
@@ -62,7 +62,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-data-prepod
+  name: postgres-pv-data-preprod
   labels:
     type: local
 spec:
@@ -86,7 +86,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-data-prepod
+  name: postgres-pvc-data-preprod
 spec:
   accessModes:
     - ReadWriteOnce
@@ -94,17 +94,17 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: storageclass-odoo
-  volumeName: postgres-pv-data-prepod
+  volumeName: postgres-pv-data-preprod
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: odoo-postgres-pod-prepod
+  name: odoo-postgres-pod-preprod
   labels:
-    app: odoo-postgres-prepod
+    app: odoo-postgres-preprod
 spec:
   containers:
-    - name: postgres-prepod
+    - name: postgres-preprod
       image: postgres:15
       securityContext:
         runAsUser: 999
@@ -126,30 +126,30 @@ spec:
   volumes:
     - name: postgres-data-volume
       persistentVolumeClaim:
-        claimName: postgres-pvc-data-prepod
+        claimName: postgres-pvc-data-preprod
     - name: postgres-config-volume
       configMap:
-        name: postgres-config-prepod
+        name: postgres-config-preprod
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: odoo-pod-prepod
+  name: odoo-pod-preprod
   labels:
-    app: odoo-prepod
+    app: odoo-preprod
 spec:
   initContainers:
     - name: wait-for-postgres
       image: bitnami/kubectl:1.27.7-debian-11-r0
       command: ["sh", "-c", "until kubectl --namespace pre-production get pod odoo-postgres-pod-prepod -o jsonpath='{.status.phase}' | grep -q Running; do sleep 1; done"]
   containers:
-    - name: odoo-prepod
+    - name: odoo-preprod
       image: odoo:16
       ports:
         - containerPort: 8069
       env:
         - name: HOST
-          value: odoo-postgres-service-prepod
+          value: odoo-postgres-service-preprod
         - name: PORT
           value: "5432"
         - name: USER
@@ -167,7 +167,7 @@ spec:
   volumes:
     - name: config-volume
       configMap:
-        name: odoo-config-prepod
+        name: odoo-config-preprod
     - name: addons-volume
       hostPath:
         path: /home/master/volume/pre-production/odoo/addons
