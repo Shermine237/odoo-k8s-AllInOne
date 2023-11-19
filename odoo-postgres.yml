@@ -21,6 +21,11 @@ data:
     db_password = odoo
     addons_path = /mnt/extra-addons
     debug_mode = True
+    test_enable = True
+    test_all = True
+    [database]
+    db_name = odoo
+    db_filter = odoo_*
 ---
 apiVersion: v1
 kind: Service
@@ -50,6 +55,43 @@ spec:
   type: NodePort
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv-prepod
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 2Gi
+  storageClassName: storageclass-odoo
+  local:
+    path: /home/master/volume/pre-production/postgres
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - k8s-master
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc-prepod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: storageclass-odoo
+  volumeName: postgres-pv-prepod
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: odoo-postgres-pod-prepod
@@ -64,6 +106,8 @@ spec:
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
+        - name: POSTGRES_DB
+          value: postgres
         - name: PGDATA
           value: /var/lib/postgresql/data
       volumeMounts:
@@ -71,14 +115,14 @@ spec:
           mountPath: /etc/postgresql/postgresql.conf
           subPath: postgresql.conf
         - name: postgres-data-volume
-          mountPath: /var/lib/postgresql/data
+          mountPath: /var/lib/postgresql/data/pgdata
   volumes:
     - name: postgres-config-volume
       configMap:
         name: postgres-config-prepod
     - name: postgres-data-volume
-      hostPath:
-        path: /home/master/volume/pre-production/postgres
+        persistentVolumeClaim:
+           claimName: postgres-pvc-prepod
 ---
 apiVersion: v1
 kind: Pod
@@ -87,6 +131,10 @@ metadata:
   labels:
     app: odoo-prepod
 spec:
+  initContainers:
+    - name: wait-for-postgres
+      image: bitnami/kubectl:1.27.7-debian-11-r0
+      command: ["sh", "-c", "until kubectl --namespace pre-production get pod odoo-postgres-pod-prepod -o jsonpath='{.status.phase}' | grep -q Running; do sleep 1; done"]
   containers:
     - name: odoo-prepod
       image: odoo:16
@@ -100,6 +148,8 @@ spec:
         - name: USER
           value: odoo
         - name: PASSWORD
+          value: odoo
+        - name: DATABASE
           value: odoo
       volumeMounts:
         - name: config-volume
