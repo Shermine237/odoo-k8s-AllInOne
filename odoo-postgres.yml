@@ -62,7 +62,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-data-preprod
+  name: postgres-pv-data
   labels:
     type: local
 spec:
@@ -86,7 +86,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-data-preprod
+  name: postgres-pvc-data
 spec:
   accessModes:
     - ReadWriteOnce
@@ -94,7 +94,7 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: storageclass-odoo
-  volumeName: postgres-pv-data-preprod
+  volumeName: postgres-pv-data
 ---
 apiVersion: v1
 kind: Pod
@@ -106,33 +106,22 @@ spec:
   containers:
     - name: postgres-preprod
       image: postgres:15
-      securityContext:
-        runAsUser: 999
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          chmod 0700 $PGDATA
-          postgres -c config_file=/etc/postgresql/postgresql.conf
       env:
         - name: POSTGRES_USER
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
+        - name: POSTGRES_DB
+          value: postgres
         - name: PGDATA
-          value: /var/lib/postgresql/data
+          value: /var/lib/postgresql/data/pgdata
       volumeMounts:
         - name: postgres-data-volume
           mountPath: /var/lib/postgresql/data/pgdata
-        - name: postgres-config-volume
-          mountPath: /etc/postgresql/postgresql.conf
-          subPath: postgresql.conf
   volumes:
     - name: postgres-data-volume
       persistentVolumeClaim:
-        claimName: postgres-pvc-data-preprod
-    - name: postgres-config-volume
-      configMap:
-        name: postgres-config-preprod
+        claimName: postgres-pvc-data
 ---
 apiVersion: v1
 kind: Pod
