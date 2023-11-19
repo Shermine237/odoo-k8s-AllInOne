@@ -20,19 +20,6 @@ data:
     db_filter = odoo_*
 ---
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-config-preprod
-data:
-  postgresql.conf: |
-    listen_addresses = '*'
-    max_connections = 100
-    shared_buffers = 128MB
-    effective_cache_size = 512MB
-    work_mem = 4MB
-    maintenance_work_mem = 64MB
----
-apiVersion: v1
 kind: Service
 metadata:
   name: odoo-postgres-service-preprod
