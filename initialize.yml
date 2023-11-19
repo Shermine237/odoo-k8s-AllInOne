@@ -64,7 +64,7 @@ spec:
       image: odoo:16
       command: ["/bin/sh", "-c"]
       args:
-        - odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database odoo --stop-after-init
+        - odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database odoo --dev all
       ports:
         - containerPort: 8069
       env:
