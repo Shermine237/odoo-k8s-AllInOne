@@ -122,7 +122,7 @@ spec:
         - name: postgres-data-volume
           mountPath: /var/lib/postgresql/data/pgdata
         - name: postgres-config-volume
-          mountPath: /etc/postgresql/
+          mountPath: /etc/postgresql
   volumes:
     - name: postgres-data-volume
       persistentVolumeClaim:
