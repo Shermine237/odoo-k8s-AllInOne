@@ -28,7 +28,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-data-init
+  name: postgres-pv-data
   labels:
     type: local
 spec:
@@ -52,7 +52,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-data-init
+  name: postgres-pvc-data
 spec:
   accessModes:
     - ReadWriteOnce
@@ -60,7 +60,7 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: storageclass-odoo
-  volumeName: postgres-pv-data-init
+  volumeName: postgres-pv-data
 ---
 apiVersion: v1
 kind: Pod
@@ -87,7 +87,7 @@ spec:
   volumes:
     - name: postgres-data-volume
       persistentVolumeClaim:
-        claimName: postgres-pvc-data-init
+        claimName: postgres-pvc-data
 ---
 apiVersion: v1
 kind: Pod
