@@ -94,6 +94,10 @@ metadata:
   labels:
     app: odoo-init
 spec:
+  initContainers:
+    - name: wait-for-postgres
+      image: bitnami/kubectl:1.27.7-debian-11-r0
+      command: ["sh", "-c", "until kubectl --namespace pre-production get pod odoo-postgres-pod-init -o jsonpath='{.status.phase}' | grep -q Running; do sleep 1; done"]
   containers:
     - name: odoo-init
       image: odoo:16
