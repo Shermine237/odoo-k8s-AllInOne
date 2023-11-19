@@ -101,13 +101,13 @@ spec:
   containers:
     - name: postgres-prepod
       image: postgres:15
+      command: ["postgres"]
+      args: ["-c", "config_file=/etc/postgresql/postgresql.conf"]
       env:
         - name: POSTGRES_USER
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
-        - name: POSTGRES_DB
-          value: postgres
         - name: PGDATA
           value: /var/lib/postgresql/data
       volumeMounts:
@@ -121,8 +121,8 @@ spec:
       configMap:
         name: postgres-config-prepod
     - name: postgres-data-volume
-        persistentVolumeClaim:
-           claimName: postgres-pvc-prepod
+      persistentVolumeClaim:
+        claimName: postgres-pvc-prepod
 ---
 apiVersion: v1
 kind: Pod
