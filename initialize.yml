@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: odoo-postgres-service-prepod
+  name: odoo-postgres-service-init
 spec:
   selector:
-    app: odoo-postgres-prepod
+    app: odoo-postgres-init
   ports:
     - protocol: TCP
       port: 5432
@@ -14,10 +14,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: odoo-service-prepod
+  name: odoo-service-init
 spec:
   selector:
-    app: odoo-prepod
+    app: odoo-init
   ports:
     - protocol: TCP
       port: 8069
@@ -28,12 +28,12 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: odoo-postgres-pod-prepod
+  name: odoo-postgres-pod-init
   labels:
-    app: odoo-postgres-prepod
+    app: odoo-postgres-init
 spec:
   containers:
-    - name: postgres-prepod
+    - name: postgres-init
       image: postgres:15
       env:
         - name: POSTGRES_USER
@@ -53,18 +53,19 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: odoo-pod-prepod
+  name: odoo-pod-init
   labels:
-    app: odoo-prepod
+    app: odoo-init
 spec:
   containers:
-    - name: odoo-prepod
+    - name: odoo-init
       image: odoo:16
+      command: ["odoo", "--init", "base", "--db_host=$HOST", "--db_port=$PORT", "--db_user=$USER", "--db_password=$PASSWORD"]
       ports:
         - containerPort: 8069
       env:
         - name: HOST
-          value: odoo-postgres-service-prepod
+          value: odoo-postgres-service-init
         - name: PORT
           value: "5432"
         - name: USER
