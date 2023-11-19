@@ -48,9 +48,6 @@ spec:
             operator: In
             values:
               - k8s-master
-              - k8s-worker01
-              - k8s-worker02
-              - k8s-worker03
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -80,13 +77,11 @@ spec:
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
-        - name: POSTGRES_DB
-          value: odoo
         - name: PGDATA
-          value: /var/lib/postgresql/data
+          value: /var/lib/postgresql/data/pgdata
       volumeMounts:
         - name: postgres-data-volume
-          mountPath: /var/lib/postgresql/data
+          mountPath: /var/lib/postgresql/data/pgdata
   volumes:
      - name: postgres-data-volume
        persistentVolumeClaim:
@@ -102,6 +97,9 @@ spec:
   containers:
     - name: odoo-init
       image: odoo:16
+      command: ["/bin/sh", "-c"]
+      args:
+        - odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --dev all
       ports:
         - containerPort: 8069
       env:
