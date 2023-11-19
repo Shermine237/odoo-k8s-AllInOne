@@ -40,6 +40,8 @@ spec:
           value: odoo
         - name: POSTGRES_PASSWORD
           value: odoo
+        - name: POSTGRES_DB
+          value: odoo
         - name: PGDATA
           value: /var/lib/postgresql/data
       volumeMounts:
@@ -60,7 +62,9 @@ spec:
   containers:
     - name: odoo-init
       image: odoo:16
-      command: ["odoo", "--init", "base", "--db_host=$HOST", "--db_port=$PORT", "--db_user=$USER", "--db_password=$PASSWORD"]
+      command: ["/bin/sh", "-c"]
+      args:
+        - odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database odoo --stop-after-init
       ports:
         - containerPort: 8069
       env:
