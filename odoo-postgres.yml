@@ -20,6 +20,19 @@ data:
     db_filter = odoo_*
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config-prepod
+data:
+  postgresql.conf: |
+    listen_addresses = '*'
+    max_connections = 100
+    shared_buffers = 128MB
+    effective_cache_size = 512MB
+    work_mem = 4MB
+    maintenance_work_mem = 64MB
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: odoo-postgres-service-prepod
@@ -45,30 +58,6 @@ spec:
       targetPort: 8069
       nodePort: 30010
   type: NodePort
-  ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgres-pv-config-prepod
-  labels:
-    type: local
-spec:
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  capacity:
-    storage: 1Gi
-  storageClassName: storageclass-odoo
-  local:
-    path: /home/master/volume/pre-production/postgres/config
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-              - k8s-master
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -93,19 +82,6 @@ spec:
             operator: In
             values:
               - k8s-master
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc-config-prepod
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: storageclass-odoo
-  volumeName: postgres-pv-config-prepod
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -145,14 +121,15 @@ spec:
         - name: postgres-data-volume
           mountPath: /var/lib/postgresql/data/pgdata
         - name: postgres-config-volume
-          mountPath: /etc/postgresql/
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
   volumes:
     - name: postgres-data-volume
       persistentVolumeClaim:
         claimName: postgres-pvc-data-prepod
     - name: postgres-config-volume
-      persistentVolumeClaim:
-        claimName: postgres-pvc-config-prepod
+      configMap:
+        name: postgres-config-prepod
 ---
 apiVersion: v1
 kind: Pod
