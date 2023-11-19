@@ -28,7 +28,31 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-init
+  name: postgres-pv-config-init
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 1Gi
+  storageClassName: storageclass-odoo
+  local:
+    path: /home/master/volume/pre-production/postgres/config
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - k8s-master
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv-data-init
   labels:
     type: local
 spec:
@@ -39,7 +63,7 @@ spec:
     storage: 2Gi
   storageClassName: storageclass-odoo
   local:
-    path: /home/master/volume/pre-production/postgres
+    path: /home/master/volume/pre-production/postgres/data
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -52,7 +76,20 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-init
+  name: postgres-pvc-config-init
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storageclass-odoo
+  volumeName: postgres-pv-config-init
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc-data-init
 spec:
   accessModes:
     - ReadWriteOnce
@@ -60,7 +97,7 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: storageclass-odoo
-  volumeName: postgres-pv-init
+  volumeName: postgres-pv-data-init
 ---
 apiVersion: v1
 kind: Pod
@@ -84,10 +121,15 @@ spec:
       volumeMounts:
         - name: postgres-data-volume
           mountPath: /var/lib/postgresql/data/pgdata
+        - name: postgres-config-volume
+          mountPath: /etc/postgresql/
   volumes:
-     - name: postgres-data-volume
-       persistentVolumeClaim:
-          claimName: postgres-pvc-init
+    - name: postgres-data-volume
+      persistentVolumeClaim:
+        claimName: postgres-pvc-data-init
+    - name: postgres-config-volume
+      persistentVolumeClaim:
+        claimName: postgres-pvc-config-init
 ---
 apiVersion: v1
 kind: Pod
