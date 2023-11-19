@@ -108,8 +108,11 @@ spec:
       image: postgres:15
       securityContext:
         runAsUser: 999
-      command: ["postgres"]
-      args: ["-c", "config_file=/etc/postgresql/postgresql.conf"]
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          chmod 0700 $PGDATA
+          postgres -c config_file=/etc/postgresql/postgresql.conf
       env:
         - name: POSTGRES_USER
           value: odoo
