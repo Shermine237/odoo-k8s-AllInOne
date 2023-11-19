@@ -28,30 +28,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-config-init
-  labels:
-    type: local
-spec:
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  capacity:
-    storage: 1Gi
-  storageClassName: storageclass-odoo
-  local:
-    path: /home/master/volume/pre-production/postgres/config
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-              - k8s-master
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
   name: postgres-pv-data-init
   labels:
     type: local
@@ -72,19 +48,6 @@ spec:
             operator: In
             values:
               - k8s-master
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc-config-init
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: storageclass-odoo
-  volumeName: postgres-pv-config-init
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -127,9 +90,6 @@ spec:
     - name: postgres-data-volume
       persistentVolumeClaim:
         claimName: postgres-pvc-data-init
-    - name: postgres-config-volume
-      persistentVolumeClaim:
-        claimName: postgres-pvc-config-init
 ---
 apiVersion: v1
 kind: Pod
