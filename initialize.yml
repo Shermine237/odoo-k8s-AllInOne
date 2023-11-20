@@ -140,9 +140,6 @@ spec:
   containers:
     - name: odoo-init
       image: odoo:16
-      securityContext:
-        privileged: true
-        runAsUser: 0
       command: ["/bin/sh", "-c"]
       args:
         - odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database $DATABASE --dev all
