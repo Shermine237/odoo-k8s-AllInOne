@@ -43,7 +43,7 @@ spec:
     - protocol: TCP
       port: 8069
       targetPort: 8069
-      nodePort: 30010
+      nodePort: 30015
   type: NodePort
 ---
 apiVersion: v1
@@ -200,7 +200,6 @@ spec:
       image: odoo:16
       securityContext:
         privileged: true
-        runAsUser: 0
       ports:
         - containerPort: 8069
       env:
