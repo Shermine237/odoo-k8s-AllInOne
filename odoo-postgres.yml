@@ -124,6 +124,9 @@ spec:
   containers:
     - name: odoo-preprod
       image: odoo:16
+      securityContext:
+        privileged: true
+        runAsUser: 0
       ports:
         - containerPort: 8069
       env:
