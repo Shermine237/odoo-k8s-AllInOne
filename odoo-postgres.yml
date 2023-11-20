@@ -12,9 +12,6 @@ data:
     db_user = odoo
     db_password = odoo
     addons_path = /mnt/extra-addons
-    debug_mode = True
-    test_enable = True
-    test_all = True
     [database]
     db_name = odoo
     db_filter = odoo_*
