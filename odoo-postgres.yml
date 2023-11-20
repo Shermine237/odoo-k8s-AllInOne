@@ -49,6 +49,54 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  name: odoo-pv-addons
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 2Gi
+  storageClassName: storageclass-odoo
+  local:
+    path: /home/master/volume/pre-production/odoo/addons
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - k8s-master
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: odoo-pv-web-data
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 2Gi
+  storageClassName: storageclass-odoo
+  local:
+    path: /home/master/volume/pre-production/odoo/web-data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - k8s-master
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
   name: postgres-pv-data
   labels:
     type: local
@@ -69,6 +117,32 @@ spec:
             operator: In
             values:
               - k8s-master
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: odoo-pvc-addons
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: storageclass-odoo
+  volumeName: odoo-pv-addons
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: odoo-pvc-web-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: storageclass-odoo
+  volumeName: odoo-pv-web-data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -146,10 +220,15 @@ spec:
           subPath: odoo.conf
         - name: addons-volume
           mountPath: /mnt/extra-addons
+        - name: web-data-volume
+          mountPath: /var/lib/odoo
   volumes:
     - name: config-volume
       configMap:
         name: odoo-config-preprod
     - name: addons-volume
-      hostPath:
-        path: /home/master/volume/pre-production/odoo/addons
+      persistentVolumeClaim:
+        claimName: odoo-pvc-addons
+    - name: web-data-volume
+      persistentVolumeClaim:
+        claimName: odoo-pvc-web-data
