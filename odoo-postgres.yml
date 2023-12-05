@@ -14,8 +14,8 @@ data:
     addons_path = /mnt/extra-addons
     data_dir = /var/lib/odoo
     [database]
-    db_name = odoo
-    db_filter = odoo_*
+    db_name = odoo-db
+    db_filter = odoo-db_*
 ---
 apiVersion: v1
 kind: Service
