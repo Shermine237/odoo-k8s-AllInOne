@@ -10,7 +10,7 @@ Odoo and Postgres working in namespace pre-production
 #### Wait until odoo-pod-init running
 <code>watch kubectl --namespace pre-production get pod</code>
 #### Setup odoo
-<p>Go to browser, enter odoo link and create database odoo and make sure login match login in odoo-postgres.yml</p>
+<p>Go to browser, enter odoo link and create database <code>odoo-db</code> and make sure login match login in odoo-postgres.yml</p>
 <p>After create we don't need theese pods</p>
 
 ### 3- Delete initialize.yml
