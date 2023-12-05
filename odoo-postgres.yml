@@ -12,7 +12,6 @@ data:
     db_user = odoo
     db_password = odoo
     addons_path = /mnt/extra-addons
-    data_dir = /var/lib/odoo
     [database]
     db_name = odoo-db
     db_filter = odoo-db_*
