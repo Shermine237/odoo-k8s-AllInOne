@@ -12,6 +12,7 @@ data:
     db_user = odoo
     db_password = odoo
     addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+    data_dir = /var/lib/odoo
     [database]
     db_name = odoo
     db_filter = odoo_*
