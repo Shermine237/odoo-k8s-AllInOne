@@ -106,7 +106,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database $DATABASE --dev all
+          odoo --init base --db_host $HOST --db_port $PORT --db_user $USER --db_password $PASSWORD --database $DATABASE
       ports:
         - containerPort: 8069
       env:
