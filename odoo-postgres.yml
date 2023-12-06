@@ -32,6 +32,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: odoo-service-preprod-dev
+spec:
+  selector:
+    app: odoo-preprod
+  ports:
+    - protocol: TCP
+      port: 8070
+      targetPort: 8070
+      nodePort: 30020
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: odoo-service-preprod
 spec:
   selector:
