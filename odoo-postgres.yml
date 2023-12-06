@@ -41,6 +41,7 @@ spec:
       port: 8070
       targetPort: 8070
       nodePort: 30020
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
